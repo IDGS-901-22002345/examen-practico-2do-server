@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id                    Int                 @id @default(autoincrement())
+  title                 String
+  description           String              @db.Text
+  category              String
+  price                 Float
+  discountPercentage    Float
+  rating                Float
+  stock                 Int
+  brand                 String?
+  sku                   String
+  weight                Float
+  warrantyInformation   String?
+  shippingInformation   String?
+  availabilityStatus    String
+  returnPolicy          String?
+  minimumOrderQuantity  Int
+  thumbnail             String
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  dimensions            Dimensions?         @relation(fields: [dimensionsId], references: [id])
+  dimensionsId          Int?                @unique
+  meta                  Meta?               @relation(fields: [metaId], references: [id])
+  metaId                Int?                @unique
+  sale                  Sale[]
+  images                Image[]
+  tags                  Tag[]
+  reviews               Review[]
+}
+
+model Dimensions {
+  id        Int       @id @default(autoincrement())
+  width     Float
+  height    Float
+  depth     Float
+  product   Product?
+}
+
+model Meta {
+  id         Int       @id @default(autoincrement())
+  createdAt  DateTime
+  updatedAt  DateTime
+  barcode    String
+  qrCode     String
+  product    Product?
+}
+
+model Image {
+  id         Int       @id @default(autoincrement())
+  url        String
+  product    Product   @relation(fields: [productId], references: [id])
+  productId  Int
+}
+
+model Tag {
+  id         Int       @id @default(autoincrement())
+  name       String
+  product    Product   @relation(fields: [productId], references: [id])
+  productId  Int
+}
+
+model Review {
+  id              Int       @id @default(autoincrement())
+  rating          Float
+  comment         String    @db.Text
+  date            DateTime
+  reviewerName    String
+  reviewerEmail   String
+  product         Product   @relation(fields: [productId], references: [id])
+  productId       Int
+}
+
+model Sale {
+  id         Int      @id @default(autoincrement())
+  productId  Int
+  quantity   Int
+  totalPrice Float
+  createdAt  DateTime @default(now())
+  product    Product  @relation(fields: [productId], references: [id])
+}
+
+
